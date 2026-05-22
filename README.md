@@ -1,3 +1,7 @@
+Here's the updated README:
+
+---
+
 # 🏆 Achievement Management System
 
 > A centralized platform for tracking and showcasing academic achievements. Students access their accomplishments instantly. Teachers record them effortlessly. Everyone gets clarity.
@@ -47,6 +51,10 @@ python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 
+# Configure environment variables
+copy .env.example .env
+# Open .env and set your SECRET_KEY and FLASK_ENV
+
 # Initialize and run
 python init_db.py
 python app.py
@@ -64,10 +72,25 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
+# Configure environment variables
+cp .env.example .env
+# Open .env and set your SECRET_KEY and FLASK_ENV
+
 # Initialize and run
 python init_db.py
 python app.py
 ```
+
+### Environment Variables
+
+Create a `.env` file in the project root (use `.env.example` as a template) and set the following:
+
+```env
+FLASK_ENV=development
+SECRET_KEY=your-strong-secret-key-here
+```
+
+> ⚠️ **Never commit your `.env` file.** It is listed in `.gitignore` by default.
 
 **🌐 Open your browser** → `http://localhost:5000`
 
@@ -78,6 +101,8 @@ python app.py
 | Technology | Purpose |
 |------------|---------|
 | **Flask** | Lightweight Python web framework |
+| **Flask Sessions** | Secure, server-side session management and authentication |
+| **Werkzeug** | Password hashing via `generate_password_hash` and `check_password_hash` |
 | **SQLite** | Embedded database for local storage |
 | **JavaScript** | Dynamic interactivity (vanilla JS) |
 | **HTML/CSS** | Responsive UI with theme support |
@@ -107,6 +132,13 @@ python app.py
 | **Batch Mode** | Manage multiple entries efficiently |
 | **Dashboard** | View submission statistics and trends |
 
+### 🔐 Security & Access Control
+
+| Feature | Description |
+|---------|-------------|
+| **Flask Sessions** | All authentication is handled server-side using secure Flask sessions — no third-party auth providers required |
+| **Password Hashing** | User passwords are securely hashed in the local database using Werkzeug
+
 ### 🎪 Achievement Types
 
 The system supports comprehensive tracking for:
@@ -128,6 +160,7 @@ achievement-management-system/
 ├── app.py                    # Flask application + routing logic
 ├── init_db.py                # Database schema initialization
 ├── requirements.txt          # Python dependencies
+├── .env.example              # Environment variable template
 │
 ├── static/
 │   ├── css/                  # Stylesheets + dark/light themes
@@ -135,7 +168,8 @@ achievement-management-system/
 │   └── certificates/         # Uploaded certificate files
 │
 ├── templates/                # Jinja2 HTML templates
-├── database/                 # SQLite database files
+├── ams.db                    # SQLite database
+├── instance/                 # Instance-specific files
 │
 ├── README.md                 # This file
 └── CONTRIBUTING.md           # Contribution guidelines
@@ -154,9 +188,9 @@ achievement-management-system/
 │ email       │    1:N     │ teacher_id  │ FK   N:1   │ email       │
 │ password    │ ─────────> │ type        │ <───────── │ password    │
 │ department  │            │ event_name  │            │ department  │
-│ ...         │            │ date        │            │ ...         │
-└─────────────┘            │ position    │            └─────────────┘
-                           │ certificate │
+│ is_approved │            │ date        │            │ is_approved │
+│ ...         │            │ position    │            │ ...         │
+└─────────────┘            │ certificate │            └─────────────┘
                            │ ...         │
                            └─────────────┘
 ```
@@ -166,7 +200,7 @@ achievement-management-system/
 ## 🎨 Key Features Explained
 
 ### 🌓 Dark/Light Mode
-Toggle between themes with one click. Preferences persist across sessions using localStorage. Smooth transitions and eye-friendly color schemes.
+Toggle between themes with one click. Preferences persist across sessions. Smooth transitions and eye-friendly color schemes.
 
 ### 🔎 Smart Student Search
 Type student ID or name — results appear instantly. No more scrolling through endless lists. Auto-complete makes teacher workflows lightning-fast.
@@ -183,6 +217,15 @@ Visual dashboards show:
 - Max file size: 5MB
 - Secure storage with unique filenames
 - One-click download access
+
+
+### 🛡️ Role-Based Access Control
+Routes are protected using custom Python decorators:
+- `@student_required` — restricts access to authenticated students only
+- `@teacher_required` — restricts access to authenticated teachers only
+- `@admin_required` — restricts access to administrators only
+
+Attempting to access a restricted route without the correct role redirects the user immediately, ensuring strict privilege separation across the application.
 
 ### 🔧 Custom Fields by Type
 Each achievement category has specialized fields:
@@ -206,6 +249,7 @@ Each achievement category has specialized fields:
 | Teacher Dashboard | `/teacher-dashboard` | Teachers only |
 | View Achievements | `/view-achievements` | Students only |
 | Add Achievement | `/add-achievement` | Teachers only |
+| Admin Panel | `/admin` | Admins only |
 
 ---
 
@@ -231,6 +275,9 @@ We welcome contributions! Here's how to get started:
 - [x] Student & teacher dashboards
 - [x] Certificate upload/download
 - [x] Dark mode support
+- [x] Flask Sessions authentication
+- [x] Role-based access control (RBAC)
+- [x] Admin approval workflow
 
 ### Phase 2 (Planned)
 - [ ] 📱 Mobile app (iOS + Android)
@@ -242,7 +289,6 @@ We welcome contributions! Here's how to get started:
 ### Phase 3 (Future)
 - [ ] 📊 Advanced predictive analytics
 - [ ] 📄 Export as PDF portfolio
-- [ ] 🔐 OAuth authentication
 - [ ] ☁️ Cloud deployment options
 
 ---
