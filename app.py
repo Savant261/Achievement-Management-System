@@ -17,7 +17,6 @@ except ImportError:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(16))
-app.permanent_session_lifetime = timedelta(days=30)
 
 # Session security configuration
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -253,56 +252,7 @@ def init_db():
 # Call initialization function
 init_db()
 
-# Permission decorators for RBAC
-def login_required(f):
-    """Decorator to check if user is logged in"""
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logged_in"):
-            return redirect(url_for("home"))
-        return f(*args, **kwargs)
-    return decorated_function
 
-def admin_required(f):
-    """Decorator to check if user is admin"""
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logged_in") or not session.get("admin_id"):
-            return redirect(url_for("home"))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def superadmin_required(f):
-    """Decorator to check if user is super admin"""
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logged_in") or not session.get("admin_id") or not session.get("is_superuser"):
-            return redirect(url_for("admin_dashboard"))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def student_required(f):
-    """Decorator to check if user is student"""
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logged_in") or not session.get("student_id"):
-            return redirect(url_for("student"))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def teacher_required(f):
-    """Decorator to check if user is teacher"""
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logged_in") or not session.get("teacher_id"):
-            return redirect(url_for("teacher"))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 @app.context_processor
